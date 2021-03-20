@@ -6,6 +6,7 @@ from keras.utils import get_file
 from ffhq_dataset.face_alignment import image_align
 from ffhq_dataset.landmarks_detector import LandmarksDetector
 import multiprocessing
+import numpy as np
 
 LANDMARKS_MODEL_URL = 'http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2'
 
@@ -26,6 +27,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Align faces from input images', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('raw_dir', help='Directory with raw images for face alignment')
     parser.add_argument('aligned_dir', help='Directory for storing aligned images')
+    parser.add_argument('--landmarks_path=', help='Directory for storing landmarks')
     parser.add_argument('--output_size', default=1024, help='The dimension of images for input to the model', type=int)
     parser.add_argument('--x_scale', default=1, help='Scaling factor for x dimension', type=float)
     parser.add_argument('--y_scale', default=1, help='Scaling factor for y dimension', type=float)
@@ -38,6 +40,10 @@ if __name__ == "__main__":
                                                LANDMARKS_MODEL_URL, cache_subdir='temp'))
     RAW_IMAGES_DIR = args.raw_dir
     ALIGNED_IMAGES_DIR = args.aligned_dir
+    try:
+        LANDMARKS_DIR=args.landmarks_path
+    except:
+        LANDMARKS_DIR=''
 
     landmarks_detector = LandmarksDetector(landmarks_model_path)
     for img_name in os.listdir(RAW_IMAGES_DIR):
@@ -55,6 +61,8 @@ if __name__ == "__main__":
                     aligned_face_path = os.path.join(ALIGNED_IMAGES_DIR, face_img_name)
                     image_align(raw_img_path, aligned_face_path, face_landmarks, output_size=args.output_size, x_scale=args.x_scale, y_scale=args.y_scale, em_scale=args.em_scale, alpha=args.use_alpha)
                     print('Wrote result %s' % aligned_face_path)
+                    if LANDMARKS_DIR:
+                        np.save(os.path.join(LANDMARKS_DIR, os.path.splitext(img_name)[0] + '.npy'), face_landmarks)
                 except:
                     print("Exception in face alignment!")
         except:

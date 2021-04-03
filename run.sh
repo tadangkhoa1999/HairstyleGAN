@@ -10,6 +10,8 @@ merge_hair_images_path=$MERGE_HAIR_IMAGES_PATH
 generated_images_path=$GENERATED_IMAGES_PATH
 latent_representations_path=$LATENT_REPRESENTATIONS_PATH
 landmarks_path=$LANDMARKS_PATH
+hair_path=$HAIR_PATH
+hair_landmarks_path=$HAIR_LANDMARKS_PATH
 
 # model path
 resnet_model=$RESNET_MODEL # https://drive.google.com/uc?id=1aT59NFy9-bNyXjDuZOTMl0qX0jmZc6Zb
@@ -31,11 +33,12 @@ if [ $stage -le 0 ]; then
 
     python -W ignore align_images.py $raw_images_path $aligned_images_path --landmarks_path=$landmarks_path --output_size=1024
 fi
-exit 1
 
 # merge hair by segmentation
 if [ $stage -le 1 ]; then
     echo '==================== Merge hair by segmentation ===================='
+    rm $merge_hair_images_path/*
+    python util/merge_hair.py --face_dir $aligned_images_path --hair_dir $hair_path --merge_hair_dir $merge_hair_images_path --face_landmark_dir $landmarks_path --hair_landmark_dir $hair_landmarks_path
 fi
 
 # encode images and generate images

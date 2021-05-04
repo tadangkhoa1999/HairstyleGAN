@@ -53,6 +53,6 @@ if [ $stage -le 2 ]; then
 
     rm -rf $latent_representations_path $generated_images_path
 
-    python encode_images.py --optimizer=lbfgs --face_mask=False --iterations=$encode_iterations --use_lpips_loss=0 --use_discriminator_loss=0 --output_video=True $aligned_images_path $generated_images_path $latent_representations_path
+    # python encode_images.py --optimizer=lbfgs --face_mask=False --iterations=$encode_iterations --use_lpips_loss=0 --use_discriminator_loss=0 --output_video=True $aligned_images_path $generated_images_path $latent_representations_path
     python encode_images.py --optimizer=lbfgs --face_mask=False --iterations=$encode_iterations --use_lpips_loss=0 --use_discriminator_loss=0 --output_video=True $merge_hair_images_path $generated_images_path $latent_representations_path
 fi

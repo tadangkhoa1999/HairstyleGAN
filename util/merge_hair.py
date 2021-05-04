@@ -97,7 +97,7 @@ def affineTransformHair(face_path, hair_path, face_landmark_path, hair_landmark_
     resize_score = np.linalg.norm(pts2[0] - pts2[2]) / np.linalg.norm(pts1[0] - pts1[2])
     r0 = resize_score * np.linalg.norm(pts1[0] - pts1[1])
     r1 = resize_score * np.linalg.norm(pts1[1] - pts1[2])
-    pts2[1] = get_intersections(pts2[0, 0], pts2[0, 1], r0, pts2[2, 0], pts2[2, 1], r1)
+    pts2[1] = get_uper_intersections(pts2[0, 0], pts2[0, 1], r0, pts2[2, 0], pts2[2, 1], r1)
     M = cv2.getAffineTransform(pts1, pts2)
     newHair = cv2.warpAffine(newHair, M, (cols, rows))
     

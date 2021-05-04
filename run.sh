@@ -38,6 +38,7 @@ fi
 if [ $stage -le 1 ]; then
     echo '==================== Merge hair by segmentation ===================='
     cd $root
+    mkdir -p "$merge_hair_images_path"
     rm $merge_hair_images_path/*
     python util/merge_hair.py --face_dir $aligned_images_path --hair_dir $hair_path --merge_hair_dir $merge_hair_images_path --face_landmark_dir $landmarks_path --hair_landmark_dir $hair_landmarks_path
 fi

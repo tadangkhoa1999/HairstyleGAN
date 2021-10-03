@@ -1,4 +1,6 @@
 import os
+import sys
+sys.path.append(os.getcwd())
 import numpy as np
 import cv2
 
@@ -29,7 +31,7 @@ def d(a, b):
 def draw_hair_landmarks(face_dir, face_landmark_dir):
     for img_name in os.listdir(face_dir):
         img_path = os.path.join(face_dir, img_name)
-        img_number = img_name.split('_')[0]
+        img_number = img_name.split('.')[0]
         face_landmark_path = os.path.join(face_landmark_dir, img_number + '.npy')
 
         lm = np.array(np.load(face_landmark_path))
@@ -48,7 +50,7 @@ def draw_hair_landmarks(face_dir, face_landmark_dir):
         pts2 = np.array([left_ear, forehead_avg, right_ear])
         for i in pts2:
             face = cv2.circle(face, (int(i[0]), int(i[1])), radius=2, color=(0, 0, 255), thickness=-1)
-        
+
         cv2.imwrite(img_name, face)
 
 
@@ -71,27 +73,15 @@ def get_hair_landmarks(hair_dir):
                         break
                 else:
                     hair_landmark.append(np.array([j, i]))
-                    
+
         hair_landmark = np.array(hair_landmark)
         np.save(f'{hair_number}.npy', hair_landmark)
 
 
-def visualize_hair_landmarks(img_path, landmarks_path):
-    lm = np.array(np.load(landmarks_path))
-    img = cv2.imread(img_path, cv2.IMREAD_COLOR)
-
-    for i in lm:
-        img = cv2.circle(img, (int(i[0]), int(i[1])), radius=10, color=(0, 0, 255), thickness=-1)
-
-    cv2.imshow('test', img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-
 if __name__ == "__main__":
-    face_dir = 'aligned_images'
-    face_landmark_dir = 'landmarks'
-    hair_dir = 'hairs'
+    face_dir = 'data/raw_images'
+    face_landmark_dir = 'exp/features/landmarks'
+    hair_dir = 'data/hairs'
 
-    # get_hair_landmarks(hair_dir)
-    draw_hair_landmarks(face_dir, face_landmark_dir)
+    get_hair_landmarks(hair_dir)
+    # draw_hair_landmarks(face_dir, face_landmark_dir)

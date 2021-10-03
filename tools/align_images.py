@@ -4,6 +4,7 @@ sys.path.append(os.getcwd())
 import bz2
 import argparse
 
+from tqdm import tqdm
 import numpy as np
 
 import utils
@@ -31,7 +32,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Align faces from input images', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('raw_dir', help='Directory with raw images for face alignment')
     parser.add_argument('aligned_dir', help='Directory for storing aligned images')
-    parser.add_argument('--landmarks_path', help='Directory for storing landmarks')
+    parser.add_argument('--landmarks_path', help='Directory for storing landmarks', required=True)
+    parser.add_argument('--aligned_landmarks_path', help='Directory for storing landmarks', required=True)
     parser.add_argument('--output_size', default=1024, help='The dimension of images for input to the model', type=int)
     parser.add_argument('--x_scale', default=1, help='Scaling factor for x dimension', type=float)
     parser.add_argument('--y_scale', default=1, help='Scaling factor for y dimension', type=float)
@@ -43,25 +45,19 @@ if __name__ == "__main__":
     landmarks_model_path = unpack_bz2(utils.open_url(LANDMARKS_MODEL_URL, return_filename=True))
     RAW_IMAGES_DIR = args.raw_dir
     ALIGNED_IMAGES_DIR = args.aligned_dir
-    try:
-        LANDMARKS_DIR=args.landmarks_path
-    except:
-        LANDMARKS_DIR=''
+    LANDMARKS_DIR=args.landmarks_path
+    ALIGNED_LANDMARKS_DIR=args.aligned_landmarks_path
 
+    print('Aligning images ...')
     landmarks_detector = LandmarksDetector(landmarks_model_path)
-    for img_name in os.listdir(RAW_IMAGES_DIR):
-        print('Aligning %s ...' % img_name)
+    for img_name in tqdm(os.listdir(RAW_IMAGES_DIR)):
         raw_img_path = os.path.join(RAW_IMAGES_DIR, img_name)
-        fn = face_img_name = '%s_%02d.png' % (os.path.splitext(img_name)[0], 1)
+        fn = face_img_name = '%s.png' % (os.path.splitext(img_name)[0])
         if os.path.isfile(fn):
             continue
-        print('Getting landmarks...')
         for i, face_landmarks in enumerate(landmarks_detector.get_landmarks(raw_img_path), start=1):
-            print('Starting face alignment...')
-            face_img_name = '%s_%02d.png' % (os.path.splitext(img_name)[0], i)
+            np.save(os.path.join(LANDMARKS_DIR, os.path.splitext(img_name)[0] + '.npy'), face_landmarks)
             aligned_face_path = os.path.join(ALIGNED_IMAGES_DIR, face_img_name)
             image_align(raw_img_path, aligned_face_path, face_landmarks, output_size=args.output_size, x_scale=args.x_scale, y_scale=args.y_scale, em_scale=args.em_scale, alpha=args.use_alpha)
-            print('Wrote result %s' % aligned_face_path)
-            if LANDMARKS_DIR:
-                for i, new_face_landmarks in enumerate(landmarks_detector.get_landmarks(aligned_face_path), start=1):
-                    np.save(os.path.join(LANDMARKS_DIR, os.path.splitext(img_name)[0] + '.npy'), new_face_landmarks)
+            for i, new_face_landmarks in enumerate(landmarks_detector.get_landmarks(aligned_face_path), start=1):
+                np.save(os.path.join(ALIGNED_LANDMARKS_DIR, os.path.splitext(img_name)[0] + '.npy'), new_face_landmarks)

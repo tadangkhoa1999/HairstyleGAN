@@ -420,6 +420,10 @@ def open_url(url: str, cache_dir: str = None, num_attempts: int = 10, verbose: b
         if len(cache_files) == 1:
             filename = cache_files[0]
             return filename if return_filename else open(filename, "rb")
+        elif len(cache_files) >= 1:
+            safe_name = re.sub(r"[^0-9a-zA-Z-._]", "_", url)
+            cache_file = os.path.join(cache_dir, url_md5 + "_" + safe_name)
+            return cache_file if return_filename else open(cache_file, "rb")
 
     # Download.
     url_name = None

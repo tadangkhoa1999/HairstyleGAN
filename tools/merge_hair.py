@@ -1,8 +1,10 @@
+import os
+import argparse
+from tqdm import tqdm
+import math
 import numpy as np
 import cv2
-import argparse
-import os
-import math
+
 
 def read_transparent_png(filename):
     image_4channel = cv2.imread(filename, cv2.IMREAD_UNCHANGED)
@@ -28,7 +30,7 @@ def get_uper_intersections(x0, y0, r0, x1, y1, r1):
     # circle 2: (x1, y1), radius r1
 
     d = math.sqrt((x1-x0)**2 + (y1-y0)**2)
-    
+
     # non intersecting
     if d > r0 + r1 :
         return None
@@ -41,11 +43,10 @@ def get_uper_intersections(x0, y0, r0, x1, y1, r1):
     else:
         a=(r0**2-r1**2+d**2)/(2*d)
         h=math.sqrt(r0**2-a**2)
-        x2=x0+a*(x1-x0)/d   
-        y2=y0+a*(y1-y0)/d   
+        x2=x0+a*(x1-x0)/d
+        y2=y0+a*(y1-y0)/d
         x3=x2+h*(y1-y0)/d     
-        y3=y2-h*(x1-x0)/d 
-
+        y3=y2-h*(x1-x0)/d
         x4=x2-h*(y1-y0)/d
         y4=y2+h*(x1-x0)/d
 
@@ -100,7 +101,7 @@ def affineTransformHair(face_path, hair_path, face_landmark_path, hair_landmark_
     pts2[1] = get_uper_intersections(pts2[0, 0], pts2[0, 1], r0, pts2[2, 0], pts2[2, 1], r1)
     M = cv2.getAffineTransform(pts1, pts2)
     newHair = cv2.warpAffine(newHair, M, (cols, rows))
-    
+
     return mergeHair(face, newHair)
 
 
@@ -114,9 +115,10 @@ if __name__ == "__main__":
 
     args, other_args = parser.parse_known_args()
 
-    for img_name in os.listdir(args.face_dir):
+    print('Merge hair ...')
+    for img_name in tqdm(os.listdir(args.face_dir)):
         img_path = os.path.join(args.face_dir, img_name)
-        img_number = img_name.split('_')[0]
+        img_number = img_name.split('.')[0]
         face_landmark_path = os.path.join(args.face_landmark_dir, img_number + '.npy')
 
         for hair_name in os.listdir(args.hair_dir):

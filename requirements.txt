@@ -1,0 +1,14 @@
+numpy
+scipy
+requests
+yacs
+psutil
+click
+tqdm
+ninja
+imageio-ffmpeg==0.4.3
+pyspng
+opencv-python
+lmdb
+imageio
+dlib

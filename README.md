@@ -43,7 +43,7 @@ python tools/merge_hair.py --face_dir exp/features/aligned_images/ --hair_dir da
 
 ## Generate merge hair-face images
 ```
-Generate merge hair-face images --input_dir exp/features/merge_hair_images/ --output_dir exp/results/
+python tools/generate_merge_hair_images.py --input_dir exp/features/merge_hair_images/ --output_dir exp/results/
 ```
 
 ## Result
